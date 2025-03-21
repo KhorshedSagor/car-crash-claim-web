@@ -76,23 +76,63 @@ export default function Home() {
           ref={chatContainerRef}
           className="h-64 overflow-y-auto mb-4 scroll-smooth bg-white rounded-lg p-4" // Faded background
         >
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} mb-2`}
-            >
+          {messages.length === 0 ? (
+            // Placeholder for empty chat
+            <div className="h-full flex flex-col items-center justify-center">
+              <Image
+                src="/empty-chat.png" // Path to your placeholder image in the public folder
+                alt="Empty Chat"
+                width={100}
+                height={100}
+                className="opacity-50"
+              />
+              <p className="mt-2 text-gray-500 text-sm">No messages yet. Start the conversation!</p>
+            </div>
+          ) : (
+            // Chat messages with avatars
+            messages.map((message, index) => (
               <div
-                className={`${
-                  message.isUser ? 'bg-[#4a0649] text-white' : 'bg-[#f3e8f3] text-gray-800'
-                } p-3 rounded-lg max-w-xs`}
+                key={index}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} mb-2`}
               >
-                {message.text}
-                {message.timestamp && (
-                  <div className="text-xs text-gray-300 mt-1">{message.timestamp}</div>
+                {/* Avatar for Chatbot */}
+                {!message.isUser && (
+                  <div className="w-8 h-8 bg-white mr-2 flex items-center justify-center">
+                    <Image
+                      src="/chatbot-avatar.png" // Path to your chatbot avatar in the public folder
+                      alt="Chatbot Avatar"
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  </div>
+                )}
+                {/* Message Bubble */}
+                <div
+                  className={`${
+                    message.isUser ? 'bg-[#4a0649] text-white' : 'bg-[#f3e8f3] text-gray-800'
+                  } p-3 rounded-lg max-w-xs`}
+                >
+                  {message.text}
+                  {message.timestamp && (
+                    <div className="text-xs text-gray-300 mt-1">{message.timestamp}</div>
+                  )}
+                </div>
+                {/* Avatar for User */}
+                {message.isUser && (
+                  <div className="w-8 h-8 bg-white ml-2 flex items-center justify-center">
+                    <Image
+                      src="/user-avatar.png" // Path to your user avatar in the public folder
+                      alt="User Avatar"
+                      width={32}
+                      height={32}
+                      
+                    />
+                  </div>
                 )}
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Chat Input and Send Button */}
