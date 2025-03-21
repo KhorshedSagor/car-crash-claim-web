@@ -1,6 +1,7 @@
 "use client"; // Mark this component as a Client Component
 
 import { useState, useRef, useEffect } from 'react';
+import Image from 'next/image'; // Import the Image component
 
 export default function Home() {
   const [claimText, setClaimText] = useState('');
@@ -36,7 +37,7 @@ export default function Home() {
         setTimeout(() => {
           setMessages((prev) => [
             ...prev,
-            { text: "Thank you for your message! We'll get back to you shortly.", isUser: false },
+            { text: "Thank you for your messaging us! Do you have any details to share?", isUser: false },
           ]);
           setHasReplied(true); // Mark that the chatbot has replied
         }, 1000);
@@ -45,23 +46,27 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-2">
       {/* Logo */}
-      <div className="w-full max-w-2xl flex items-stretch border-4 border-[#4a0649] rounded-lg overflow-hidden shadow-lg">
-        <span className="bg-[#4a0649] text-white flex-1 text-3xl sm:text-4xl md:text-5xl font-bold text-center py-4">
-          CRASH
-        </span>
-        <span className="bg-white text-[#4a0649] flex-1 text-3xl sm:text-4xl md:text-5xl font-bold text-center py-4">
-          CLAIM
-        </span>
+      <div className="w-full max-w-2xl flex items-center justify-center">
+        <div className="w-full h-[100px] sm:h-[150px] md:h-[200px] relative">
+          <Image
+            src="/logo.png" // Path to your logo file in the public folder
+            alt="CrashClaim Logo"
+            fill // Fill the container
+            className="object-contain" // Ensure the logo scales properly
+            priority // Prioritize loading the logo
+            sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, 60vw" // Responsive sizes
+          />
+        </div>
       </div>
 
       {/* Additional Content */}
-      <h1 className="mt-8 text-3xl sm:text-4xl md:text-5xl font-bold text-[#4a0649] text-center">
+      <h1 className="mt-1 text-3xl sm:text-4xl md:text-5xl font-bold text-[#4a0649] text-center">
         Welcome to CrashClaim
       </h1>
       <p className="mt-4 text-base sm:text-lg md:text-xl text-gray-600 text-center max-w-2xl">
-        Your one-stop solution for claims management.
+        Injured by a reckless driver? No calls, no hassle—CrashClaim will handle your settlement or lawsuit while you focus on recovery.
       </p>
 
       {/* Chat Interface */}
@@ -90,11 +95,11 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Chat Input */}
+        {/* Chat Input and Send Button */}
         <div className="flex items-center">
           <textarea
             className="w-full p-3 sm:p-4 border border-[#4a0649] bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a0649] focus:border-[#4a0649] placeholder-gray-400 resize-none"
-            rows={2}
+            rows={2} // Adjust rows to match button height
             placeholder="Tell us what happened..."
             value={claimText}
             onChange={(e) => setClaimText(e.target.value)}
@@ -106,10 +111,18 @@ export default function Home() {
             }}
           />
           <button
-            className="ml-4 bg-[#4a0649] text-white p-3 rounded-lg hover:bg-[#5a0759] focus:outline-none focus:ring-2 focus:ring-[#4a0649] transition-all duration-300"
+            className="ml-4 h-full bg-[#4a0649] text-white py-3 px-6 rounded-lg hover:bg-[#5a0759] focus:outline-none focus:ring-2 focus:ring-[#4a0649] focus:ring-offset-2 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl flex flex-col items-center justify-center"
             onClick={handleSubmit}
           >
-            Send
+            <span className="text-sm font-semibold">Send</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mt-2 transform rotate-90" // Rotate 90 degrees
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+            </svg>
           </button>
         </div>
       </div>
