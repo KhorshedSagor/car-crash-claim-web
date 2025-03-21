@@ -1,13 +1,47 @@
 "use client"; // Mark this component as a Client Component
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export default function Home() {
   const [claimText, setClaimText] = useState('');
+  const [messages, setMessages] = useState<{ text: string; isUser: boolean; timestamp?: string }[]>(
+    []
+  ); // Store chat messages
+  const [hasReplied, setHasReplied] = useState(false); // Track if the chatbot has replied
+  const chatContainerRef = useRef<HTMLDivElement>(null); // Reference to the chat container
+
+  // Auto-scroll to the bottom when messages change
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleSubmit = () => {
-    alert(`Claim submitted: ${claimText}`);
-    setClaimText(''); // Clear the textarea after submission
+    if (claimText.trim()) {
+      // Add the user's message to the chat
+      const newMessage = { text: claimText, isUser: true, timestamp: 'Just now' };
+      setMessages((prev) => [...prev, newMessage]);
+      setClaimText(''); // Clear the textarea
+
+      // Remove the timestamp from older messages
+      setMessages((prev) =>
+        prev.map((msg, index) =>
+          index === prev.length - 1 ? msg : { ...msg, timestamp: undefined }
+        )
+      );
+
+      // Send an automated reply only for the first message
+      if (!hasReplied) {
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            { text: "Thank you for your message! We'll get back to you shortly.", isUser: false },
+          ]);
+          setHasReplied(true); // Mark that the chatbot has replied
+        }, 1000);
+      }
+    }
   };
 
   return (
@@ -30,26 +64,54 @@ export default function Home() {
         Your one-stop solution for claims management.
       </p>
 
-      {/* Claim Dialog Box */}
+      {/* Chat Interface */}
       <div className="mt-8 w-full max-w-2xl bg-[#f3e8f3] p-6 sm:p-8 rounded-lg shadow-lg border border-[#4a0649]">
-        {/* Textarea */}
-        <textarea
-          className="w-full p-4 sm:p-5 border border-[#4a0649] bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a0649] focus:border-[#4a0649] placeholder-gray-400"
-          rows={6}
-          placeholder="Tell us what happened..."
-          value={claimText}
-          onChange={(e) => setClaimText(e.target.value)}
-        />
-      </div>
-
-      {/* Submit Button */}
-      <div className="mt-6 w-full max-w-2xl flex justify-center">
-        <button
-          className="bg-[#4a0649] text-white py-3 px-6 rounded-lg hover:bg-[#5a0759] focus:outline-none focus:ring-2 focus:ring-[#4a0649] transition-all duration-300"
-          onClick={handleSubmit}
+        {/* Chat Messages */}
+        <div
+          ref={chatContainerRef}
+          className="h-64 overflow-y-auto mb-4 scroll-smooth bg-white rounded-lg p-4" // Faded background
         >
-          Send Claim
-        </button>
+          {messages.map((message, index) => (
+            <div
+              key={index}
+              className={`flex ${message.isUser ? 'justify-end' : 'justify-start'} mb-2`}
+            >
+              <div
+                className={`${
+                  message.isUser ? 'bg-[#4a0649] text-white' : 'bg-[#f3e8f3] text-gray-800'
+                } p-3 rounded-lg max-w-xs`}
+              >
+                {message.text}
+                {message.timestamp && (
+                  <div className="text-xs text-gray-300 mt-1">{message.timestamp}</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Chat Input */}
+        <div className="flex items-center">
+          <textarea
+            className="w-full p-3 sm:p-4 border border-[#4a0649] bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a0649] focus:border-[#4a0649] placeholder-gray-400 resize-none"
+            rows={2}
+            placeholder="Tell us what happened..."
+            value={claimText}
+            onChange={(e) => setClaimText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevent new line on Enter
+                handleSubmit(); // Submit the message
+              }
+            }}
+          />
+          <button
+            className="ml-4 bg-[#4a0649] text-white p-3 rounded-lg hover:bg-[#5a0759] focus:outline-none focus:ring-2 focus:ring-[#4a0649] transition-all duration-300"
+            onClick={handleSubmit}
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );
